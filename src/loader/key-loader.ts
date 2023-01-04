@@ -261,9 +261,37 @@ export default class KeyLoader implements ComponentAPI {
               )
             );
           }
-
+          console.log('keyInfo Loader');
+          console.log(keyInfo.decryptdata.key);
+          var bufferToBase64 = function (buffer) {
+            var s = '';
+            var uintArray = new Uint8Array(buffer);
+            uintArray.filter(function (v) {
+              s += String.fromCharCode(v);
+              return false;
+            });
+            return window.btoa(s);
+          };
+          var string = bufferToBase64(response.data);
+          string = atob(string);
+          string = string.replace(/^(#)+/, '');
+          string = string.replace(/\$+$/, '');
+          string = string.replace(/(\n)+$/, '');
+          string = string.replace(/^(\n)+/, '');
+          string = btoa(string);
+          console.log(string);
+          var convertTobytes = function (text) {
+            return new Uint8Array(
+              atob(text)
+                .split('')
+                .map(function (c) {
+                  return c.charCodeAt(0);
+                })
+            );
+          };
+          var response_data = convertTobytes(string);
           keyInfo.decryptdata.key = frag.decryptdata.key = new Uint8Array(
-            response.data as ArrayBuffer
+            response_data as ArrayBuffer
           );
 
           // detach fragment key loader on load success
